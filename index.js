@@ -503,7 +503,7 @@ const main = async (wallet) => {
 
     const trySell = async (share, log) => {
         // console.log("holdings:", holdings);
-        if (share.balance > BigInt(0)) {    // 有余额就尝试卖出
+        if (share.balance > BigInt(0)) {    // 有余额就尝试卖出(TODO:log.args.trader不等于自己才卖出)
             const price = await getSellPrice(share.subject, share.balance);
             console.log("price:", formatEther(price));
             if (!price) {
@@ -821,7 +821,7 @@ const main = async (wallet) => {
                 subject: subject,
                 cc: item.cc,
                 balance: balances[subject],
-                staking: { ...stakings[subject], startTime: Date.now() / 1000 },
+                staking: { ...stakings[subject], startTime: 0 },
                 pendingProfits: pendingProfits[subject],
                 supply: supplys[subject],
                 cost: { value: BigInt(0), time: 0 },
@@ -841,8 +841,8 @@ const main = async (wallet) => {
             let index = holdings.findIndex((v) => v.subject == holding.subject);
             if (index > -1) {
                 let old = holdings[index];
-                holding.staking.startTime = old.staking.startTime;
-                holding.cost = { value: old.cost.value, time: old.cost.time }
+                holding.staking.startTime = old.staking.startTime == 0 ? Date.now() / 1000 : old.staking.startTime;
+                holding.cost = { value: old.cost.value, time: old.cost.time == 0 ? Date.now() / 1000 : old.cost.time }
             }
         });
         holdings = subjects;
