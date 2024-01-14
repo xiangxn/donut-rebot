@@ -123,7 +123,12 @@ const fetchProfile = async (subject, count = 0) => {
                     pendingProfits: BigInt(0),
                     supply: 0,
                     cost: null,
-                    positions: BigInt(0)
+                    positions: BigInt(0),
+                    // 新增字段,可以用于策略判断
+                    followers: res.data.followers,
+                    following: res.data.following,
+                    verified: res.data.verified,
+                    donutFollowers: res.data.donutFollowers
                 };
             } else {
                 if (count < 2) {
