@@ -1,0 +1,12 @@
+[
+    {
+        "username": "necklace",
+        "address": "your wallet address",
+        "wif": "Use 'yarn run enkey' to encrypt your private key and then put here"
+    },
+    {
+        "username": "推特username,如果你只需要一个钱包,就删除掉这个 {} 的所有内容,以及上一个 {} 末尾的,",
+        "address": "你的钱包地址",
+        "wif": "加密后或加密前的私钥"
+    }
+]

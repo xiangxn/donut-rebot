@@ -1,0 +1,10 @@
+{
+    "donutAddress": "0xe86305b400E69ffFb5CF8Fce2a90659174777A79",
+    "shareAddress": "0xd9210830afDEe5C8e5120dCC7a0C4Fa23997Ef25",
+    "multicall": "0x79eA96a9857b3fcf7B037E5EE98D4da63Ff1934A",
+    "http_rpc": "https://rpc-2.bevm.io/",
+    "ws_rpc": "wss://rpc-2.bevm.io/ws",
+    "data_api": "https://bevm-alpha-api.dnt.social",
+    "scan_api": "https://scan-api.bevm.io/bevm",
+    "gasLimit": "20000000"
+}

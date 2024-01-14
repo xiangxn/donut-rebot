@@ -1,0 +1,6 @@
+wallets.json
+node_modules/
+.env
+snipe.js
+holding-*.json
+*.log
