@@ -718,6 +718,16 @@ const main = async (wallet) => {
         return balances;
     };
 
+    const getProfiles = async (arr) => {
+        let reqs = arr.map(item => fetchProfile(item.donutEth));
+        const results = await Promise.all(reqs);
+        const profiles = {};
+        results.forEach((v, i) => {
+            profiles[arr[i].donutEth.toString().toLowerCase()] = v;
+        });
+        return profiles;
+    };
+
     const updateBalance = async (subject, supply = null, updateStake = false) => {
         let s = holdings.find((s) => s.subject == subject);
         if (s) {
@@ -796,11 +806,12 @@ const main = async (wallet) => {
     const mergePositions = async (arr) => {
         // console.log("arr:", arr);
         const subjectMap = {};
-        const [balances, stakings, pendingProfits, supplys] = await Promise.all([
+        const [balances, stakings, pendingProfits, supplys, profiles] = await Promise.all([
             getBalances(arr),
             getStakings(arr),
             getPendingProfits(arr),
-            getSupply(arr)
+            getSupply(arr),
+            getProfiles(arr)
         ]);
         arr.forEach((item) => {
             const subject = item.donutEth.toString().toLowerCase();
@@ -814,7 +825,11 @@ const main = async (wallet) => {
                 pendingProfits: pendingProfits[subject],
                 supply: supplys[subject],
                 cost: { value: BigInt(0), time: 0 },
-                positions: balances[subject] + stakings[subject].amount + stakings[subject].redeemAmount + pendingProfits[subject]
+                positions: balances[subject] + stakings[subject].amount + stakings[subject].redeemAmount + pendingProfits[subject],
+                followers: profiles[subject].followers,
+                following: profiles[subject].following,
+                verified: profiles[subject].verified,
+                donutFollowers: profiles[subject].donutFollowers
             };
 
         });
