@@ -13,7 +13,7 @@ export const BuyStrategy = {
                 // 接收数量
                 { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 85 },
                 // 社交信用分数,大于此值才会买入
-                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 8000 },
+                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 100000 },
                 // 账户 nonce
                 { type: STRATEGY_TYPES.ACCOUNT_NONCE, value: 20 },
             ],
@@ -24,7 +24,7 @@ export const BuyStrategy = {
                 // 接收数量
                 { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 30 },
                 // 社交信用分数,大于此值才会买入
-                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 20000 },
+                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 250000 },
                 // 账户 nonce
                 { type: STRATEGY_TYPES.ACCOUNT_NONCE, value: 20 },
             ],
@@ -35,7 +35,7 @@ export const BuyStrategy = {
                 // 接收数量
                 { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 16 },
                 // 社交信用分数,大于此值才会买入
-                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 40000 },
+                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 400000 },
                 // 账户 nonce
                 { type: STRATEGY_TYPES.ACCOUNT_NONCE, value: 20 },
             ],
