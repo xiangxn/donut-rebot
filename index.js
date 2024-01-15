@@ -331,7 +331,7 @@ const main = async (wallet) => {
                 console.log(chalk.red("watchTradeEvent error:", error));
             },
             onLogs: (logs) => {
-                // console.log("Trade event:", logs.length);
+                console.log("Trade event:", logs.length);
                 logs.forEach((log) => {
                     tradeEventQueue.push(log)
                 });
