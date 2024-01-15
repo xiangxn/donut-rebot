@@ -406,6 +406,7 @@ const main = async (wallet) => {
                         if (share) {
                             await tryUnstake(share, log);
                         }
+                        // TODO: 或者买入新的share ?
                     }
                     if (share) {
                         await tryClaim(share);
