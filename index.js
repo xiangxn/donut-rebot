@@ -915,7 +915,7 @@ const main = async (wallet) => {
             const { request } = await publicClient.simulateContract({
                 account: privateKeyToAccount(`0x${wallet.wif}`),
                 address: config.donutAddress,
-                abi: shareABI,
+                abi: donutABI,
                 functionName: "donate",
                 args: [subjectAddress, BigInt(0)],
                 value: value,
