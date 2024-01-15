@@ -4,7 +4,12 @@ import { sleep, getPropByStringPath } from "./index.js";
 async function getTwitterUserInfo(username) {
   const browser = await puppeteer.launch({
     headless: "new",
-    args: ['--no-sandbox']
+    args: [
+      "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+      "--window-size=1920,1080",
+      "--start-maximized",
+      "--disable-gpu",
+      '--no-sandbox']
   });
   const browserProcess = browser.process();
   try {
@@ -26,17 +31,19 @@ async function getTwitterUserInfo(username) {
     });
     // 监听网络响应
     page.on("response", async (response) => {
+      console.log("response.url():", response.url())
       if (response.url().includes("UserByScreenName")) {
         try {
           const data = await response.json();
           userInfo = getPropByStringPath(data, "data.user.result.legacy");
           fetching = false;
         } catch (error) {
+          console.log("error:",error)
           fetching = false;
         }
       }
     });
-    await page.goto(`https://mobile.twitter.com/${username}`);
+    await page.goto(`https://twitter.com/${username}`);
     let sleepTime = 0;
     while (fetching && sleepTime < 20) {
       sleepTime += 0.1;

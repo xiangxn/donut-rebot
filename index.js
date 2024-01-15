@@ -1102,7 +1102,7 @@ const main = async (wallet) => {
     // await refreshHoldings();
     // procCreateEvent();
     // procTradeEvent();
-    const info = await getUserInfo("necklace_btc");
+    const info = await getUserInfo("nian20220717");
     console.log("info:", info);
     while (isRun) {
         await sleep(1);
