@@ -31,8 +31,7 @@ async function getTwitterUserInfo(username) {
     });
     // 监听网络响应
     page.on("response", async (response) => {
-      console.log("response.url():", response.url())
-      if (response.url().includes("UserByScreenName")) {
+      if (response.url().includes("UserByScreenName") && response.request().method().toUpperCase() != "OPTIONS") {
         try {
           const data = await response.json();
           userInfo = getPropByStringPath(data, "data.user.result.legacy");
