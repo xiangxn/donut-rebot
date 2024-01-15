@@ -81,7 +81,7 @@ const hoursSinceCreatedAt = (timeStamp) => {
     if (createdAt <= 0) return 0;
 
     // 获取当前的 Unix 时间戳（毫秒）
-    const now = Date.now();
+    const now = Date.now() / 1000;
 
     // 计算时间差（毫秒）
     const differenceInMilliseconds = now - createdAt;
