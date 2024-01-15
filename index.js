@@ -109,7 +109,7 @@ const fetchProfile = async (subject, count = 0) => {
             const res = await axios.get(
                 `${config.data_api}/users/byUsername?username=${user.username}`,
                 {
-                    timeout: 3000,
+                    timeout: 6000,
                 }
             );
             if (res.data?.twitterId) {
@@ -161,7 +161,7 @@ const fetchUserName = async (subject, count = 0) => {
         const res = await axios.get(
             `${config.data_api}/users/getUserByEth?ethAddress=${subject}`,
             {
-                timeout: 3000,
+                timeout: 6000,
             }
         );
         if (res.data?.twitterId) {
