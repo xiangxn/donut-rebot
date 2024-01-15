@@ -25,13 +25,13 @@ export const logIntro = () => {
     )
   );
 };
-export const logWork = ({ walletAddress, actionName, subject, price }) => {
+export const logWork = ({ walletAddress, actionName, subject, price, amount }) => {
   console.log(
     `${chalk.cyanBright(
       `[LOG ${walletAddress.slice(0, 6)}..${walletAddress.slice(-3)}]`
     )} ${actionToColor[actionName](
       actionName.toUpperCase()
-    )} > ${subject} - ${price}`
+    )} > ${subject} - ${price} - ${amount}`
   );
 };
 

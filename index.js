@@ -312,8 +312,9 @@ const main = async (wallet) => {
                 console.log(chalk.red("watchCreateEvent error:", error))
             },
             onLogs: (logs) => {
-                console.log("Create event:", logs.length);
                 logs.forEach((log) => {
+                    // @ts-ignore
+                    console.log("Create event:", log.args.subject, formatEther(log.args.amount));
                     createEventQueue.push(log)
                 })
             }
@@ -334,8 +335,9 @@ const main = async (wallet) => {
                 console.log(chalk.red("watchTradeEvent error:", error));
             },
             onLogs: (logs) => {
-                console.log("Trade event:", logs.length);
                 logs.forEach((log) => {
+                    // @ts-ignore
+                    console.log("Trade event:", log.args.subject, log.args.isBuy ? "Buy" : "Sell");
                     tradeEventQueue.push(log)
                 });
             }
@@ -488,7 +490,8 @@ const main = async (wallet) => {
                 walletAddress: wallet.address,
                 actionName: "buy",
                 subject: `${keyUser.subject} - ${keyUser.username}`,
-                price: accountInfo.receiveAmount.toString(),
+                price: BuyStrategy.buyUseFunds.toString(),
+                amount: accountInfo.receiveAmount.toString(),
             });
             const isBuy = await buyShare(
                 buyUseFunds,
