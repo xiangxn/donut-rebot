@@ -408,15 +408,8 @@ const main = async (wallet) => {
                         }
                     }
                     if (share) {
-                        // 检查是否有质押奖励可以领取
-                        if (share.pendingProfits > BigInt(0) && shouldClaim(share.subject, share.pendingProfits)) {
-                            console.log(chalk.yellow("claiming", share.subject, "pendingProfits", formatEther(share.pendingProfits)));
-                            const isClaim = await claimShare(share);
-                            console.log("isClaim:", isClaim);
-                            if (isClaim) {
-                                await updateBalance(share.subject, null, true);
-                            }
-                        }
+                        await tryClaim(share);
+                        await tryRedeem(share);
                     }
                 }
                 lastTime = Date.now();
@@ -531,18 +524,36 @@ const main = async (wallet) => {
                 }
             }
         }
-        await tryRedeem(share);
     };
 
     /**
-     * 检查unstake,如果可以领取则领取
+     * 检查是否有质押奖励可以领取
+     * @param {*} share 
+     */
+    const tryClaim = async (share) => {
+        if (share.pendingProfits > BigInt(0) && shouldClaim(share.subject, share.pendingProfits)) {
+            console.log(chalk.yellow("claiming", share.subject, "pendingProfits", formatEther(share.pendingProfits)));
+            const isClaim = await claimShare(share);
+            console.log("isClaim:", isClaim);
+            if (isClaim) {
+                await updateBalance(share.subject, null, true);
+            }
+        }
+    };
+
+    /**
+     * 检查unstake的share,如果可以领取则领取
      * @param {*} share 
      */
     const tryRedeem = async (share) => {
         if (share.staking?.redeemAmount > BigInt(0)) {
             if (BigInt(Date.now() / 1000) > share.staking.unlockTime) {
                 console.log(chalk.yellow("redeeming", share.subject, "redeemAmount", formatEther(share.staking.redeemAmount)));
-                await redeemShare(share);
+                const isRedeem = await redeemShare(share);
+                console.log("isRedeem:", isRedeem);
+                if (isRedeem) {
+                    await updateBalance(share.subject, null, true);
+                }
             }
         }
     };
