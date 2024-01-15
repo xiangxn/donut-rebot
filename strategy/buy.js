@@ -13,7 +13,11 @@ export const BuyStrategy = {
                 // 接收数量
                 { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 85 },
                 // 社交信用分数,大于此值才会买入
-                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 100000 },
+                // { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 100000 },
+                // 推特关注数
+                { type: STRATEGY_TYPES.TWITTER_FOLLOWERS, value: 10000 },
+                // 推特文章数
+                { type: STRATEGY_TYPES.TWITTER_POSTS, value: 100 },
                 // 账户 nonce
                 { type: STRATEGY_TYPES.ACCOUNT_NONCE, value: 20 },
             ],
@@ -22,9 +26,11 @@ export const BuyStrategy = {
             operator: STRATEGY_OPERATORS.AND,
             conditions: [
                 // 接收数量
-                { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 30 },
+                { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 40 },
                 // 社交信用分数,大于此值才会买入
-                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 250000 },
+                // { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 250000 },
+                { type: STRATEGY_TYPES.TWITTER_FOLLOWERS, value: 25000 },
+                { type: STRATEGY_TYPES.TWITTER_POSTS, value: 300 },
                 // 账户 nonce
                 { type: STRATEGY_TYPES.ACCOUNT_NONCE, value: 20 },
             ],
@@ -33,9 +39,11 @@ export const BuyStrategy = {
             operator: STRATEGY_OPERATORS.AND,
             conditions: [
                 // 接收数量
-                { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 16 },
+                { type: STRATEGY_TYPES.RECEIVE_AMOUNT, value: 20 },
                 // 社交信用分数,大于此值才会买入
-                { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 400000 },
+                // { type: STRATEGY_TYPES.SOCIAL_CREDIT, value: 400000 },
+                { type: STRATEGY_TYPES.TWITTER_FOLLOWERS, value: 35000 },
+                { type: STRATEGY_TYPES.TWITTER_POSTS, value: 300 },
                 // 账户 nonce
                 { type: STRATEGY_TYPES.ACCOUNT_NONCE, value: 20 },
             ],
@@ -79,6 +87,10 @@ export const isWhitelisted = (keyUser) => {
 
 const evaluateCondition = (condition, accountInfo, keyUser) => {
     switch (condition.type) {
+        case STRATEGY_TYPES.TWITTER_FOLLOWERS:
+            return accountInfo.followers >= condition.value;
+        case STRATEGY_TYPES.TWITTER_POSTS:
+            return accountInfo.posts >= condition.value;
         case STRATEGY_TYPES.SOCIAL_CREDIT:
             return keyUser.cc >= condition.value;
         case STRATEGY_TYPES.ACCOUNT_NONCE:
@@ -148,4 +160,26 @@ const evaluateStrategy = (strategy, accountInfo, keyUser) => {
     } else {
         return evaluateCondition(strategy, accountInfo, keyUser);
     }
+};
+
+const containsTwitterConditions = (strategy) => {
+    if (strategy.conditions) {
+        for (let condition of strategy.conditions) {
+            if (
+                condition.type === STRATEGY_TYPES.TWITTER_FOLLOWERS ||
+                condition.type === STRATEGY_TYPES.TWITTER_POSTS
+            ) {
+                return true;
+            }
+            if (condition.operator && containsTwitterConditions(condition)) {
+                // 如果是 AND 或 OR 条件
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+export const shouldFetchTwitterInfo = () => {
+    return containsTwitterConditions(BuyStrategy);
 };

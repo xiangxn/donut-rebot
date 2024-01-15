@@ -30,8 +30,11 @@ import {
     BuyStrategy,
     isWhitelisted,
     shouldFetchNonce,
-    shouldBuy
+    shouldBuy,
+    shouldFetchTwitterInfo
 } from "./strategy/buy.js";
+
+import { getUserInfo } from "./utils/twitter-count.js";
 
 const config = JSON.parse(readFileSync(getDir("config.json"), "utf8"));
 const wallets = JSON.parse(readFileSync(getDir("wallets.json"), "utf8"));
@@ -461,9 +464,14 @@ const main = async (wallet) => {
             return;
         }
 
-        const accountInfo = { nonce: 0, receiveAmount: parseFloat(formatEther(buyAmount)) };
+        const accountInfo = { nonce: 0, receiveAmount: parseFloat(formatEther(buyAmount)), followers: 0, posts: 0 };
         const whitelistedUser = isWhitelisted(keyUser);
         if (!whitelistedUser) {
+            if (shouldFetchTwitterInfo()) {
+                const info = await getUserInfo(keyUser.username);
+                accountInfo.followers = info.followers_count;
+                accountInfo.posts = info.statuses_count;
+            }
             if (shouldFetchNonce()) {
                 accountInfo.nonce = await publicClient.getTransactionCount({
                     address: args.subject,
@@ -1091,9 +1099,11 @@ const main = async (wallet) => {
         }
     };
 
-    await refreshHoldings();
-    procCreateEvent();
-    procTradeEvent();
+    // await refreshHoldings();
+    // procCreateEvent();
+    // procTradeEvent();
+    const info = await getUserInfo("necklace_btc");
+    console.log("info:", info);
     while (isRun) {
         await sleep(1);
     }
