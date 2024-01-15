@@ -488,7 +488,7 @@ const main = async (wallet) => {
                 walletAddress: wallet.address,
                 actionName: "buy",
                 subject: `${keyUser.subject} - ${keyUser.username}`,
-                price: accountInfo.price.toString(),
+                price: accountInfo.receiveAmount.toString(),
             });
             const isBuy = await buyShare(
                 buyUseFunds,
