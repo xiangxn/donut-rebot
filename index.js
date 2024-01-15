@@ -914,10 +914,10 @@ const main = async (wallet) => {
             await freshNonce();
             const { request } = await publicClient.simulateContract({
                 account: privateKeyToAccount(`0x${wallet.wif}`),
-                address: config.shareAddress,
+                address: config.donutAddress,
                 abi: shareABI,
-                functionName: "buyShares",
-                args: [subjectAddress, amount],
+                functionName: "donate",
+                args: [subjectAddress, BigInt(0)],
                 value: value,
                 gas: gasLimit,
                 gasPrice: parseGwei(config.gasPrice),
