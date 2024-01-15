@@ -5,7 +5,7 @@ import { getDir } from "./index.js";
 const config = JSON.parse(readFileSync(getDir("config.json"), "utf8"));
 
 export const bevm = defineChain({
-    id: 1502,
+    id: config.chain_id,
     name: 'BEVM',
     nativeCurrency: {
         decimals: 18,
