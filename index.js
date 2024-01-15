@@ -1099,11 +1099,9 @@ const main = async (wallet) => {
         }
     };
 
-    // await refreshHoldings();
-    // procCreateEvent();
-    // procTradeEvent();
-    const info = await getUserInfo("nian20220717");
-    console.log("info:", info);
+    await refreshHoldings();
+    procCreateEvent();
+    procTradeEvent();
     while (isRun) {
         await sleep(1);
     }
