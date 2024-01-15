@@ -9,5 +9,5 @@
     "explorer": "https://scan-pre.bevm.io/",
     "gasLimit": "100000",
     "gasPrice": "0.1",
-    "listen_timeout": 120
+    "listen_timeout": 60
 }

@@ -1,10 +1,13 @@
 {
-    "donutAddress": "0xe86305b400E69ffFb5CF8Fce2a90659174777A79",
-    "shareAddress": "0xd9210830afDEe5C8e5120dCC7a0C4Fa23997Ef25",
+    "donutAddress": "0x272A64DB94106e98d6733d599727AEDBB336c878",
+    "shareAddress": "0x1B0dfa8d105287C10D3D2A6a67bA503b396244A9",
     "multicall": "0x79eA96a9857b3fcf7B037E5EE98D4da63Ff1934A",
     "http_rpc": "https://rpc-2.bevm.io/",
     "ws_rpc": "wss://rpc-2.bevm.io/ws",
     "data_api": "https://bevm-alpha-api.dnt.social",
     "scan_api": "https://scan-api.bevm.io/bevm",
-    "gasLimit": "20000000"
+    "explorer": "https://scan.bevm.io/",
+    "gasLimit": "200000",
+    "gasPrice": "0.05",
+    "listen_timeout": 60
 }
