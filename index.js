@@ -393,7 +393,6 @@ const main = async (wallet) => {
                 if (log.eventName === "Trade") {
                     const args = log.args;
                     if (args.isBuy === true) {  // 买入事件
-
                         share = await updateBalance(args.subject.toString().toLowerCase(), args.supply);
                         if (share) {
                             // 处理是否卖出
@@ -406,6 +405,17 @@ const main = async (wallet) => {
                         share = await updateBalance(args.subject.toString().toLowerCase(), args.supply);
                         if (share) {
                             await tryUnstake(share, log);
+                        }
+                    }
+                    if (share) {
+                        // 检查是否有质押奖励可以领取
+                        if (share.pendingProfits > BigInt(0) && shouldClaim(share.subject, share.pendingProfits)) {
+                            console.log(chalk.yellow("claiming", share.subject, "pendingProfits", formatEther(share.pendingProfits)));
+                            const isClaim = await claimShare(share);
+                            console.log("isClaim:", isClaim);
+                            if (isClaim) {
+                                await updateBalance(share.subject, null, true);
+                            }
                         }
                     }
                 }
@@ -501,9 +511,9 @@ const main = async (wallet) => {
         }
     };
 
-    const trySell = async (share, log) => {
-        // console.log("holdings:", holdings);
-        if (share.balance > BigInt(0)) {    // 有余额就尝试卖出(TODO:log.args.trader不等于自己才卖出)
+    const trySell = async (share, buyLog) => {
+        const buyer = buyLog.args.trader.toString().toLowerCase();
+        if (share.balance > BigInt(0) && buyer != wallet.address.toLowerCase()) {    // 有余额就尝试卖出(buyLog.args.trader不等于自己才卖出)
             const price = await getSellPrice(share.subject, share.balance);
             console.log("price:", formatEther(price));
             if (!price) {
@@ -518,16 +528,6 @@ const main = async (wallet) => {
                 console.log("isSold:", isSold);
                 if (isSold) {
                     await updateBalance(share.subject);
-                }
-            }
-        } else {
-            // 检查是否有质押奖励可以领取
-            if (share.pendingProfits > BigInt(0) && shouldClaim(share.subject, share.pendingProfits)) {
-                console.log(chalk.yellow("claiming", share.subject, "pendingProfits", formatEther(share.pendingProfits)));
-                const isClaim = await claimShare(share);
-                console.log("isClaim:", isClaim);
-                if (isClaim) {
-                    await updateBalance(share.subject, null, true);
                 }
             }
         }
