@@ -121,7 +121,7 @@ const fetchProfile = async (subject, count = 0) => {
                 return {
                     twitterId: res.data.twitterId,
                     username: res.data.username,
-                    subject: subject,
+                    subject: subject.toString().toLowerCase(),
                     cc: res.data.cc,
                     balance: BigInt(0),
                     staking: null,
@@ -504,7 +504,7 @@ const main = async (wallet) => {
             console.log("isBuy:", isBuy);
             if (isBuy) {
                 keyUser.cost = { value: buyUseFunds, time: Date.now() / 1000 }
-                holdings.push(keyUser);
+                holdings.push({ ...keyUser });
                 // 自动质押
                 await tryStake(keyUser.subject, buyAmount);
                 await updateBalance(keyUser.subject, args.amount, true);
