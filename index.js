@@ -1147,6 +1147,7 @@ const main = async (wallet) => {
                     roundInfo = await getCurrentRoundInfo();
                     if (roundInfo) {
                         endTime = parseInt((roundInfo.endTime * BigInt(1000)).toString());
+                        console.log(chalk.yellow("RoundInfo rewards:", formatEther(roundInfo.rewards), "endTime:", formatDate(new Date(endTime))));
                         roundInfo = null;
                     }
                 }
