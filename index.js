@@ -1167,8 +1167,8 @@ const main = async (wallet) => {
     };
 
     await refreshHoldings();
-    // procCreateEvent();
-    // procTradeEvent();
+    procCreateEvent();
+    procTradeEvent();
     checkF3d();
 };
 
