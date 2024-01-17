@@ -7,7 +7,8 @@ import {
     getDir,
     decrypt,
     logIntro,
-    logWork
+    logWork,
+    formatDate
 } from "./utils/index.js";
 
 import {
@@ -1102,14 +1103,62 @@ const main = async (wallet) => {
         }
     };
 
+    //f3d 监听
+    const checkF3d = async () => {
+        if (config.f3d.run !== true) return;
+        console.log(chalk.green("监听f3d奖池..."))
+        let interval = config.f3d.check_interval;
+        let endTime = 0;
+        while (isRun) {
+            let roundInfo = null;
+            if (!endTime) {
+                roundInfo = await getCurrentRoundInfo();
+                // console.log("roundInfo:", roundInfo);
+            } else {
+                if (Date.now() - endTime <= config.f3d.buying_time * 1000) {
+                    // 买入自己的share
+                    await buyShare(parseEther(config.f3d.buying_price), wallet.address, BigInt(1));
+                    endTime = 0;
+                    interval = config.f3d.check_interval;
+                }
+            }
+            if (roundInfo) {
+                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && !endTime) {
+                    endTime = parseInt((roundInfo.endTime * BigInt(1000)).toString());
+                    console.log(chalk.yellow("RoundInfo rewards:", formatEther(roundInfo.rewards), "endTime:", formatDate(new Date(endTime))));
+                    roundInfo = null;
+                    interval = 1;
+                    continue;
+                }
+            }
+            await sleep(interval);
+        }
+    };
+
+    const getCurrentRoundInfo = async () => {
+        try {
+            const roundInfo = await publicClient.readContract({
+                address: config.donutAddress,
+                abi: donutABI,
+                functionName: 'getCurrentRoundInfo',
+                args: []
+            });
+            return { rewards: roundInfo[0], endTime: roundInfo[1] };
+        } catch (error) {
+            console.log("getCurrentRoundInfo error:", error.message);
+            return null;
+        }
+    };
+
     await refreshHoldings();
     procCreateEvent();
     procTradeEvent();
-    while (isRun) {
-        await sleep(1);
-    }
-    console.debug(`Rebot [${wallet.address}] stopped.\n`);
+    checkF3d();
 };
+
+process.on("exit", function (code) {
+    console.debug(`Rebot stopped.\n`);
+});
 
 // go go go
 logIntro()

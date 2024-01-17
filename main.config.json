@@ -10,5 +10,12 @@
     "explorer": "https://scan.bevm.io/",
     "gasLimit": "200000",
     "gasPrice": "0.05",
-    "listen_timeout": 60
+    "listen_timeout": 60,
+    "f3d": {
+        "run": true,
+        "min_amount": "0.0035",
+        "buying_price": "0.0001",
+        "buying_time": 10,
+        "check_interval": 300
+    }
 }

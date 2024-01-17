@@ -2,7 +2,7 @@ export { chalk } from "./chalk.js";
 
 export { formatDate } from "./date.js";
 export { randfloat, randint } from "./rand.js";
-export { sleep } from "./sleep.js";
+export { sleep, sleep2 } from "./sleep.js";
 
 export { getDir } from "./getDir.js";
 export { getPropByStringPath } from "./getProp.js";
