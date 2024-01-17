@@ -694,15 +694,28 @@ const main = async (wallet) => {
         console.log(chalk.green("刷新Holding数据..."));
         await readHoldings();
         try {
-            const res = await axios.get(
-                `${config.data_api}/users/followingList?twitterId=${wallet.twitterId}`,
+            // const res = await axios.get(
+            //     `${config.data_api}/users/followingList?twitterId=${wallet.twitterId}`,
+            //     {
+            //         timeout: 3000,
+            //         proxy: false
+            //     }
+            // );
+            const res = await axios.post(
+                `${config.graphql_api}?`,
+                {
+                    operationName: null,
+                    variables: null,
+                    query: `{ account( id: "${wallet.address}") { holdings { edges { node { subject { id } } } } } }`
+                },
                 {
                     timeout: 3000,
                     proxy: false
                 }
             );
-            if (res.data?.length) {
-                await mergePositions(res.data);
+            if (res.data && ("errors" in res.data) === false) {
+                const arr = res.data?.data?.account?.holdings?.edges.map((v) => ({ donutEth: v.node.subject.id }));
+                await mergePositions(arr);
             } else {
                 holdings = [];
             }
@@ -831,6 +844,7 @@ const main = async (wallet) => {
     };
 
     const mergePositions = async (arr) => {
+        if (!arr || arr.length < 1) return;
         // console.log("arr:", arr);
         const subjectMap = {};
         const [balances, stakings, pendingProfits, supplys, profiles] = await Promise.all([
@@ -864,6 +878,7 @@ const main = async (wallet) => {
         const subjects = Object.values(subjectMap).filter((item) => {
             return item.positions;
         });
+        // 处理质押时间与买入时间
         subjects.forEach((holding) => {
             let index = holdings.findIndex((v) => v.subject == holding.subject);
             if (index > -1) {

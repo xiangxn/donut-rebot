@@ -6,6 +6,7 @@
     "http_rpc": "https://rpc-2.bevm.io/",
     "ws_rpc": "wss://rpc-2.bevm.io/ws",
     "data_api": "https://bevm-api.dnt.social",
+    "graphql_api": "https://bg.dnt.social/graphql",
     "scan_api": "https://scan-api.bevm.io/bevm",
     "explorer": "https://scan.bevm.io/",
     "gasLimit": "200000",
