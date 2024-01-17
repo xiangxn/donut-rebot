@@ -114,6 +114,7 @@ const fetchProfile = async (subject, count = 0) => {
                 `${config.data_api}/users/byUsername?username=${user.username}`,
                 {
                     timeout: 6000,
+                    proxy: false
                 }
             );
             if (res.data?.twitterId) {
@@ -166,6 +167,7 @@ const fetchUserName = async (subject, count = 0) => {
             `${config.data_api}/users/getUserByEth?ethAddress=${subject}`,
             {
                 timeout: 6000,
+                proxy: false
             }
         );
         if (res.data?.twitterId) {
@@ -696,6 +698,7 @@ const main = async (wallet) => {
                 `${config.data_api}/users/followingList?twitterId=${wallet.twitterId}`,
                 {
                     timeout: 3000,
+                    proxy: false
                 }
             );
             if (res.data?.length) {
@@ -885,7 +888,7 @@ const main = async (wallet) => {
                 functionName: "sellShares",
                 args: [subjectAddress, amount],
                 gas: gasLimit,
-                gasPrice: parseGwei(config.gasPrice),
+                // gasPrice: parseGwei(config.gasPrice),
                 nonce: nonce++
             });
             const hash = await client.writeContract(request);
@@ -916,7 +919,7 @@ const main = async (wallet) => {
         if (amount <= BigInt(0)) return false;
         try {
             await freshNonce();
-            const { request } = await publicClient.simulateContract({
+            const data = {
                 account: privateKeyToAccount(`0x${wallet.wif}`),
                 address: config.donutAddress,
                 abi: donutABI,
@@ -924,14 +927,15 @@ const main = async (wallet) => {
                 args: [subjectAddress, BigInt(0)],
                 value: value,
                 gas: gasLimit,
-                gasPrice: parseGwei(config.gasPrice),
+                // gasPrice: parseGwei(config.gasPrice),
                 nonce: nonce++
-            });
+            };
+            const { request } = await publicClient.simulateContract(data);
             const hash = await client.writeContract(request);
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
             console.log(
                 chalk[receipt.status === "success" ? "green" : "red"](
-                    `Sell ${subjectAddress} ${receipt.status}`
+                    `Buy ${subjectAddress} ${receipt.status}`
                 )
             );
             if (receipt.status == 'success') {
@@ -962,7 +966,7 @@ const main = async (wallet) => {
                 functionName: "claim",
                 args: [share.subject],
                 gas: gasLimit,
-                gasPrice: parseGwei(config.gasPrice),
+                // gasPrice: parseGwei(config.gasPrice),
                 nonce: nonce++
             });
             const hash = await client.writeContract(request);
@@ -1000,7 +1004,7 @@ const main = async (wallet) => {
                 functionName: "redeem",
                 args: [share.subject],
                 gas: gasLimit,
-                gasPrice: parseGwei(config.gasPrice),
+                // gasPrice: parseGwei(config.gasPrice),
                 nonce: nonce++
             });
             const hash = await client.writeContract(request);
@@ -1038,7 +1042,7 @@ const main = async (wallet) => {
                 functionName: "unstake",
                 args: [subject, amount],
                 gas: gasLimit,
-                gasPrice: parseGwei(config.gasPrice),
+                // gasPrice: parseGwei(config.gasPrice),
                 nonce: nonce++
             });
             const hash = await client.writeContract(request);
@@ -1076,7 +1080,7 @@ const main = async (wallet) => {
                 functionName: "stake",
                 args: [subject, amount],
                 gas: gasLimit,
-                gasPrice: parseGwei(config.gasPrice),
+                // gasPrice: parseGwei(config.gasPrice),
                 nonce: nonce++
             });
             const hash = await client.writeContract(request);
@@ -1109,25 +1113,37 @@ const main = async (wallet) => {
         console.log(chalk.green("监听f3d奖池..."))
         let interval = config.f3d.check_interval;
         let endTime = 0;
+        let checkCount = 0;
+        let roundInfo = null;
         while (isRun) {
-            let roundInfo = null;
             if (!endTime) {
                 roundInfo = await getCurrentRoundInfo();
                 // console.log("roundInfo:", roundInfo);
             } else {
-                if (Date.now() - endTime <= config.f3d.buying_time * 1000) {
+                if (endTime - Date.now() <= config.f3d.buying_time * 1000) {
                     // 买入自己的share
                     await buyShare(parseEther(config.f3d.buying_price), wallet.address, BigInt(1));
                     endTime = 0;
                     interval = config.f3d.check_interval;
+                    continue;
                 }
+                if (checkCount >= config.f3d.check_interval) {  // 检查结束时间是否变化,5分钟检查一次
+                    checkCount = 0;
+                    roundInfo = await getCurrentRoundInfo();
+                    if (roundInfo) {
+                        endTime = parseInt((roundInfo.endTime * BigInt(1000)).toString());
+                        roundInfo = null;
+                    }
+                }
+                checkCount++;
             }
             if (roundInfo) {
-                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && !endTime) {
-                    endTime = parseInt((roundInfo.endTime * BigInt(1000)).toString());
+                let t = parseInt((roundInfo.endTime * BigInt(1000)).toString());
+                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && t - Date.now() >= 6000 && !endTime) {
+                    endTime = t
                     console.log(chalk.yellow("RoundInfo rewards:", formatEther(roundInfo.rewards), "endTime:", formatDate(new Date(endTime))));
                     roundInfo = null;
-                    interval = 1;
+                    interval = 1;   // 每秒检查一次
                     continue;
                 }
             }
@@ -1151,8 +1167,8 @@ const main = async (wallet) => {
     };
 
     await refreshHoldings();
-    procCreateEvent();
-    procTradeEvent();
+    // procCreateEvent();
+    // procTradeEvent();
     checkF3d();
 };
 

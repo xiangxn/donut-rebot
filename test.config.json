@@ -8,7 +8,7 @@
     "data_api": "https://bevm-alpha-api.dnt.social",
     "scan_api": "https://scan-api-pre.bevm.io/bevm",
     "explorer": "https://scan-pre.bevm.io/",
-    "gasLimit": "100000",
+    "gasLimit": "200000",
     "gasPrice": "0.1",
     "listen_timeout": 60,
     "f3d": {
