@@ -52,7 +52,6 @@ export const BuyStrategy = {
             // 白名单
             type: STRATEGY_TYPES.WHITELIST,
             whitelist: [
-                { username: "necklace_btc", minReceiveAmount: 85 },
                 { username: "elonmusk", minReceiveAmount: 20 },
             ],
         },

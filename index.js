@@ -1147,7 +1147,7 @@ const main = async (wallet) => {
                     roundInfo = await getCurrentRoundInfo();
                     if (roundInfo) {
                         endTime = parseInt((roundInfo.endTime * BigInt(1000)).toString());
-                        console.log(chalk.yellow("RoundInfo rewards:", formatEther(roundInfo.rewards), "endTime:", formatDate(new Date(endTime))));
+                        console.log(chalk.blueBright("RoundInfo rewards:", formatEther(roundInfo.rewards), "includes:", roundInfo.includes, "endTime:", formatDate(new Date(endTime))));
                         roundInfo = null;
                     }
                 }
@@ -1155,7 +1155,7 @@ const main = async (wallet) => {
             }
             if (roundInfo) {
                 let t = parseInt((roundInfo.endTime * BigInt(1000)).toString());
-                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && t - Date.now() >= 6000 && !endTime) {
+                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && t - Date.now() >= 6000 && roundInfo.includes == 0) {
                     endTime = t
                     console.log(chalk.yellow("RoundInfo rewards:", formatEther(roundInfo.rewards), "endTime:", formatDate(new Date(endTime))));
                     roundInfo = null;
@@ -1175,7 +1175,10 @@ const main = async (wallet) => {
                 functionName: 'getCurrentRoundInfo',
                 args: []
             });
-            return { rewards: roundInfo[0], endTime: roundInfo[1] };
+            console.log(roundInfo)
+            // @ts-ignore
+            let tmp = roundInfo.filter((v) => v.toString().toLocaleLowerCase() === wallet.address.toLocaleLowerCase());
+            return { rewards: roundInfo[0], endTime: roundInfo[1], includes: tmp.length };
         } catch (error) {
             console.log("getCurrentRoundInfo error:", error.message);
             return null;
