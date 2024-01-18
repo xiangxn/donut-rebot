@@ -1175,7 +1175,7 @@ const main = async (wallet) => {
                 functionName: 'getCurrentRoundInfo',
                 args: []
             });
-            console.log(roundInfo)
+            // console.log(roundInfo)
             // @ts-ignore
             let tmp = roundInfo.filter((v) => v.toString().toLocaleLowerCase() === wallet.address.toLocaleLowerCase());
             return { rewards: roundInfo[0], endTime: roundInfo[1], includes: tmp.length };
