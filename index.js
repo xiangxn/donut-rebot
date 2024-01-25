@@ -335,7 +335,7 @@ const main = async (wallet) => {
             abi: shareABI,
             eventName: "Trade",
             onError: error => {
-                console.log(chalk.red("watchTradeEvent error:", error));
+                console.log(chalk.red("watchTradeEvent error:", JSON.stringify(error) ));
             },
             onLogs: (logs) => {
                 logs.forEach((log) => {
@@ -562,7 +562,8 @@ const main = async (wallet) => {
      */
     const tryRedeem = async (share) => {
         if (share.staking?.redeemAmount > BigInt(0)) {
-            if (BigInt(Date.now() / 1000) > share.staking.unlockTime) {
+            // @ts-ignore
+            if (BigInt(parseInt(Date.now() / 1000)) > share.staking.unlockTime) {
                 console.log(chalk.yellow("redeeming", share.subject, "redeemAmount", formatEther(share.staking.redeemAmount)));
                 const isRedeem = await redeemShare(share);
                 console.log("isRedeem:", isRedeem);
