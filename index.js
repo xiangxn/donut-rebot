@@ -296,6 +296,7 @@ const main = async (wallet) => {
             });
             nonce = transactionCount;
         } catch (error) {
+            console.log(error)
             await sleep(2);
             await freshNonce();
         }
@@ -858,10 +859,10 @@ const main = async (wallet) => {
         arr.forEach((item) => {
             const subject = item.donutEth.toString().toLowerCase();
             subjectMap[subject] = {
-                twitterId: item.twitterId,
-                username: item.username,
+                twitterId: profiles[subject].twitterId,
+                username: profiles[subject].username,
                 subject: subject,
-                cc: item.cc,
+                cc: profiles[subject].cc,
                 balance: balances[subject],
                 staking: { ...stakings[subject], startTime: 0 },
                 pendingProfits: pendingProfits[subject],
@@ -1187,9 +1188,9 @@ const main = async (wallet) => {
     };
 
     await refreshHoldings();
-    procCreateEvent();
-    procTradeEvent();
-    checkF3d();
+    // procCreateEvent();
+    // procTradeEvent();
+    // checkF3d();
 };
 
 process.on("exit", function (code) {
