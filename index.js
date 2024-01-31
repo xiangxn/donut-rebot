@@ -19,7 +19,7 @@ import {
     parseGwei,
     formatEther,
     parseEther,
-    BaseError, ContractFunctionRevertedError
+    BaseError, ContractFunctionRevertedError, isAddress
 } from "viem";
 import { bevm } from "./utils/bevm.js";
 import { privateKeyToAccount } from "viem/accounts";
@@ -521,8 +521,11 @@ const main = async (wallet) => {
     };
 
     const trySell = async (share, buyLog) => {
-        const buyer = buyLog.args.trader.toString().toLowerCase();
-        if (share.balance > BigInt(0) && buyer != wallet.address.toLowerCase()) {    // 有余额就尝试卖出(buyLog.args.trader不等于自己才卖出)
+        if (buyLog) {
+            const buyer = buyLog.args?.trader?.toString()?.toLowerCase();
+            if (buyer == wallet.address.toLowerCase()) return;  // buyLog.args.trader不等于自己才卖出
+        }
+        if (share.balance > BigInt(0)) {    // 有余额就尝试卖出
             const price = await getSellPrice(share.subject, share.balance);
             console.log("price:", formatEther(price));
             if (!price) {
@@ -691,10 +694,12 @@ const main = async (wallet) => {
         }
     };
 
-    const refreshHoldings = async () => {
-        await freshNonce();
+    const refreshHoldings = async (readHolding = true) => {
         console.log(chalk.green("刷新Holding数据..."));
-        await readHoldings();
+        if (readHolding === true) {
+            await freshNonce();
+            await readHoldings();
+        }
         try {
             // const res = await axios.get(
             //     `${config.data_api}/users/followingList?twitterId=${wallet.twitterId}`,
@@ -1124,6 +1129,22 @@ const main = async (wallet) => {
         }
     };
 
+    // 轮询share
+    const checkShare = async () => {
+        console.log(chalk.green("监听share..."));
+        while (isRun) {
+            await sleep(60 * 10);
+            await refreshHoldings(false);
+            for (const holding of holdings) {
+                await trySell(holding);
+                await tryUnstake(holding);
+                await tryClaim(holding);
+                await tryRedeem(holding);
+                await sleep(2);
+            }
+        }
+    };
+
     //f3d 监听
     const checkF3d = async () => {
         if (config.f3d.run !== true) return;
@@ -1193,6 +1214,7 @@ const main = async (wallet) => {
     await refreshHoldings();
     procCreateEvent();
     procTradeEvent();
+    checkShare();
     checkF3d();
 };
 
