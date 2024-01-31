@@ -341,7 +341,7 @@ const main = async (wallet) => {
             onLogs: (logs) => {
                 logs.forEach((log) => {
                     // @ts-ignore
-                    console.log("Trade event:", log.args.subject, log.args.isBuy ? "Buy" : "Sell");
+                    console.log("Trade event:", log.args.subject, log.args.isBuy ? "Buy" : "Sell", formatEther(log.args.shareAmount));
                     tradeEventQueue.push(log)
                 });
             }
