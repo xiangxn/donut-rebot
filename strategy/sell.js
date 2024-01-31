@@ -8,7 +8,7 @@ const sellStrategy = {
     operator: STRATEGY_OPERATORS.OR,
     conditions: [
         // 利润大于value,才卖出
-        { type: STRATEGY_TYPES.BENEFIT, value: "0.005" },
+        { type: STRATEGY_TYPES.BENEFIT, value: "0.002" },
         // 持有时间超过多少小时后不管盈亏直接卖出
         { type: STRATEGY_TYPES.HOLDING_DURATION, value: 240 },
     ],

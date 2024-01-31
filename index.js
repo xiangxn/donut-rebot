@@ -504,8 +504,15 @@ const main = async (wallet) => {
             );
             console.log("isBuy:", isBuy);
             if (isBuy) {
-                keyUser.cost = { value: buyUseFunds, time: Date.now() / 1000 }
-                holdings.push({ ...keyUser });
+                let index = holdings.findIndex((v) => v.subject == keyUser.subject);
+                if (index > -1) {
+                    keyUser.cost = { value: buyUseFunds + holdings[index].cost.value, time: Math.floor(Date.now() / 1000) };
+                    keyUser.staking = { ...holdings[index].staking };
+                    holdings[index] = keyUser;
+                } else {
+                    keyUser.cost = { value: buyUseFunds, time: Math.floor(Date.now() / 1000) };
+                    holdings.push({ ...keyUser });
+                }
                 // 自动质押
                 await tryStake(keyUser.subject, buyAmount);
                 await updateBalance(keyUser.subject, args.amount, true);
@@ -527,7 +534,7 @@ const main = async (wallet) => {
         }
         if (share.balance > BigInt(0)) {    // 有余额就尝试卖出
             const price = await getSellPrice(share.subject, share.balance);
-            console.log("price:", formatEther(price));
+            console.log("sell price:", formatEther(price));
             if (!price) {
                 return;
             }
@@ -539,7 +546,7 @@ const main = async (wallet) => {
                 const isSold = await sellShare(share.subject, share.balance);
                 console.log("isSold:", isSold);
                 if (isSold) {
-                    await updateBalance(share.subject);
+                    await updateBalance(share.subject, null, false, profit);
                 }
             }
         }
@@ -567,7 +574,7 @@ const main = async (wallet) => {
     const tryRedeem = async (share) => {
         if (share.staking?.redeemAmount > BigInt(0)) {
             // @ts-ignore
-            if (BigInt(parseInt(Date.now() / 1000)) > share.staking.unlockTime) {
+            if (BigInt(Math.floor(Date.now() / 1000)) > share.staking.unlockTime) {
                 console.log(chalk.yellow("redeeming", share.subject, "redeemAmount", formatEther(share.staking.redeemAmount)));
                 const isRedeem = await redeemShare(share);
                 console.log("isRedeem:", isRedeem);
@@ -775,7 +782,7 @@ const main = async (wallet) => {
         return profiles;
     };
 
-    const updateBalance = async (subject, supply = null, updateStake = false) => {
+    const updateBalance = async (subject, supply = null, updateStake = false, profit = null) => {
         let s = holdings.find((s) => s.subject == subject);
         if (s) {
             let calls = [
@@ -802,7 +809,7 @@ const main = async (wallet) => {
             s.balance = reps[0].result;
             if (updateStake) {
                 // @ts-ignore
-                s.staking = { ...reps[1].result, startTime: Date.now() / 1000 };
+                s.staking = { ...reps[1].result, startTime: Math.floor(Date.now() / 1000) };
             } else {
                 // @ts-ignore
                 s.staking = { ...reps[1].result, startTime: s.staking?.startTime || 0 };
@@ -811,6 +818,13 @@ const main = async (wallet) => {
             s.positions = s.balance + s.staking.amount + s.staking.redeemAmount + s.pendingProfits;
             if (supply) {
                 s.supply = supply;
+            }
+            if (profit && profit > BigInt(0)) {
+                let cost = s.cost.value;
+                cost = cost - profit;
+                if (cost < BigInt(0)) cost = BigInt(0);
+                s.cost.value = cost;
+                s.cost.time = Math.floor(Date.now() / 1000);
             }
             await saveHoldings();
             return s;
@@ -890,8 +904,8 @@ const main = async (wallet) => {
             let index = holdings.findIndex((v) => v.subject == holding.subject);
             if (index > -1) {
                 let old = holdings[index];
-                holding.staking.startTime = old.staking.startTime == 0 ? Date.now() / 1000 : old.staking.startTime;
-                holding.cost = { value: old.cost.value, time: old.cost.time == 0 ? Date.now() / 1000 : old.cost.time }
+                holding.staking.startTime = old.staking.startTime == 0 ? Math.floor(Date.now() / 1000) : old.staking.startTime;
+                holding.cost = { value: old.cost.value, time: old.cost.time == 0 ? Math.floor(Date.now() / 1000) : old.cost.time }
             }
         });
         holdings = subjects;
@@ -1136,6 +1150,7 @@ const main = async (wallet) => {
             await sleep(60 * 10);
             await refreshHoldings(false);
             for (const holding of holdings) {
+                console.log(chalk.red("holding 信息 ", holding.subject, holding.username," positions:", formatEther(holding.positions), "staking:", formatEther(holding.staking?.amount)));
                 await trySell(holding);
                 await tryUnstake(holding);
                 await tryClaim(holding);
