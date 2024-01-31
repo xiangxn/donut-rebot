@@ -886,7 +886,7 @@ const main = async (wallet) => {
                 staking: { ...stakings[subject], startTime: 0 },
                 pendingProfits: pendingProfits[subject],
                 supply: supplys[subject],
-                cost: { value: BigInt(0), time: 0 },
+                cost: { value: parseEther("0.0001"), time: Math.floor(Date.now() / 1000) },
                 positions: balances[subject] + stakings[subject].amount + stakings[subject].redeemAmount + pendingProfits[subject],
                 followers: profiles[subject].followers,
                 following: profiles[subject].following,
@@ -905,7 +905,10 @@ const main = async (wallet) => {
             if (index > -1) {
                 let old = holdings[index];
                 holding.staking.startTime = old.staking.startTime == 0 ? Math.floor(Date.now() / 1000) : old.staking.startTime;
-                holding.cost = { value: old.cost.value, time: old.cost.time == 0 ? Math.floor(Date.now() / 1000) : old.cost.time }
+                holding.cost = {
+                    value: old.cost.value == BigInt(0) ? parseEther("0.0001") : old.cost.value,
+                    time: old.cost.time == 0 ? Math.floor(Date.now() / 1000) : old.cost.time
+                };
             }
         });
         holdings = subjects;
@@ -1150,7 +1153,7 @@ const main = async (wallet) => {
             await sleep(60 * 10);
             await refreshHoldings(false);
             for (const holding of holdings) {
-                console.log(chalk.red("holding 信息 ", holding.subject, holding.username," positions:", formatEther(holding.positions), "staking:", formatEther(holding.staking?.amount)));
+                console.log(chalk.red("holding 信息 ", holding.subject, holding.username, " positions:", formatEther(holding.positions), "staking:", formatEther(holding.staking?.amount)));
                 await trySell(holding);
                 await tryUnstake(holding);
                 await tryClaim(holding);
@@ -1227,10 +1230,10 @@ const main = async (wallet) => {
     };
 
     await refreshHoldings();
-    procCreateEvent();
-    procTradeEvent();
-    checkShare();
-    checkF3d();
+    // procCreateEvent();
+    // procTradeEvent();
+    // checkShare();
+    // checkF3d();
 };
 
 process.on("exit", function (code) {
