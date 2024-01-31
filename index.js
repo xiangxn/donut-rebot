@@ -1144,7 +1144,7 @@ const main = async (wallet) => {
                     interval = config.f3d.check_interval;
                     continue;
                 }
-                if (checkCount >= config.f3d.check_interval) {  // 检查结束时间是否变化,5分钟检查一次
+                if (checkCount >= 5) {  // 检查结束时间是否变化,5s检查一次
                     checkCount = 0;
                     roundInfo = await getCurrentRoundInfo();
                     if (roundInfo) {
