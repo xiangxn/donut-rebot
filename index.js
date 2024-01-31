@@ -1230,10 +1230,10 @@ const main = async (wallet) => {
     };
 
     await refreshHoldings();
-    // procCreateEvent();
-    // procTradeEvent();
-    // checkShare();
-    // checkF3d();
+    procCreateEvent();
+    procTradeEvent();
+    checkShare();
+    checkF3d();
 };
 
 process.on("exit", function (code) {
