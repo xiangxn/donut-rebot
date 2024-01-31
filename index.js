@@ -336,7 +336,7 @@ const main = async (wallet) => {
             abi: shareABI,
             eventName: "Trade",
             onError: error => {
-                console.log(chalk.red("watchTradeEvent error:", JSON.stringify(error) ));
+                console.log(chalk.red("watchTradeEvent error:", JSON.stringify(error)));
             },
             onLogs: (logs) => {
                 logs.forEach((log) => {
@@ -1132,12 +1132,13 @@ const main = async (wallet) => {
         let endTime = 0;
         let checkCount = 0;
         let roundInfo = null;
+        let includes = 0;
         while (isRun) {
             if (!endTime) {
                 roundInfo = await getCurrentRoundInfo();
                 // console.log("roundInfo:", roundInfo);
             } else {
-                if (endTime - Date.now() <= config.f3d.buying_time * 1000) {
+                if (includes == 0 && endTime - Date.now() <= config.f3d.buying_time * 1000) {
                     // 买入自己的share
                     await buyShare(parseEther(config.f3d.buying_price), wallet.address, BigInt(1));
                     endTime = 0;
@@ -1149,7 +1150,8 @@ const main = async (wallet) => {
                     roundInfo = await getCurrentRoundInfo();
                     if (roundInfo) {
                         endTime = parseInt((roundInfo.endTime * BigInt(1000)).toString());
-                        console.log(chalk.blueBright("RoundInfo rewards:", formatEther(roundInfo.rewards), "includes:", roundInfo.includes, "endTime:", formatDate(new Date(endTime))));
+                        includes = roundInfo.includes;
+                        console.log(chalk.blueBright("RoundInfo rewards:", formatEther(roundInfo.rewards), "includes:", includes, "endTime:", formatDate(new Date(endTime))));
                         roundInfo = null;
                     }
                 }
@@ -1157,7 +1159,8 @@ const main = async (wallet) => {
             }
             if (roundInfo) {
                 let t = parseInt((roundInfo.endTime * BigInt(1000)).toString());
-                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && t - Date.now() >= 6000 && roundInfo.includes == 0) {
+                includes = roundInfo.includes;
+                if (roundInfo.rewards >= parseEther(config.f3d.min_amount) && t - Date.now() >= 6000 && includes == 0) {
                     endTime = t
                     console.log(chalk.yellow("RoundInfo rewards:", formatEther(roundInfo.rewards), "endTime:", formatDate(new Date(endTime))));
                     roundInfo = null;
