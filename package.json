@@ -8,7 +8,8 @@
   "private": false,
   "scripts": {
     "start": "node index.js",
-    "enkey": "node enkey.js"
+    "enkey": "node enkey.js",
+    "checkx":"node checkx.js"
   },
   "dependencies": {
     "axios": "^1.6.5",
