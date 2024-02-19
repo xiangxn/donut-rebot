@@ -1,0 +1,1 @@
+apt install libxkbcommon-x11-0 libgtk-3-0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm-dev libpango-1.0-0 libcairo2 libasound2
