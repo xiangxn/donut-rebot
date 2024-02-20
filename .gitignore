@@ -6,3 +6,5 @@ snipe.js
 holding-*.json
 *.log
 .DS_Store
+
+checks/address.json
